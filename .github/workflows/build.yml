@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json
+name: build
+
+on:
+  push:
+    branches:
+      - "source"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: "Set environment variables"
+      run: |
+        echo "SOURCE_DIR=$GITHUB_WORKSPACE/source" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v3
+      with:
+        ref: source
+        submodules: true
+        fetch-depth: 0
+        path: source
+
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v2.5.0
+      with:
+        hugo-version: latest
+
+    - name: Build Site
+      run: |
+        cd $SOURCE_DIR
+        hugo --minify --gc -d dist
+
+    - uses: actions/checkout@v3
+      with:
+        ref: master
+        path: master
+    - name: Push site
+      run: |
+        cd $GITHUB_WORKSPACE/master
+        mv $SOURCE_DIR/dist/* .
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "build #$(git rev-parse --short "$GITHUB_SHA")"
+        git push origin master
