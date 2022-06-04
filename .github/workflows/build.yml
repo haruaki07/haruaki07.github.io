@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
+    if: ${{ contains(github.event.head_commit.message, 'build:')  }}
     steps:
     - name: "Set environment variables"
       run: |
@@ -42,5 +43,5 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add .
-        git commit -m "build #$GITHUB_SHA"
+        git commit -m "build $(git rev-parse --short $GITHUB_SHA)"
         git push origin master
