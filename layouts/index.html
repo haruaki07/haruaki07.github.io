@@ -32,18 +32,22 @@
 {{ end }}
 </div>
 
-<h1>Latest Projects</h1>
+<h1>Latest projects</h1>
 
-<div class="image-grid">
+<div class="posts-list">
 {{ with .Site.GetPage "/projects" }}
     {{ range first 3 (sort .Data.Pages "Date" "desc")}}
-        <a href="{{ .Permalink }}" title="{{ .Title }}">
-        {{ $image := .Page.Resources.GetMatch .Params.image }}
-        {{ with $image }}
-            {{ $thumb := .Resize "400x" }}
-            <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="img-responsive">
-        {{end}}
-        </a>
+        <div class="post">
+            <p>
+                <div class="date">{{ .PublishDate.Format "Jan. 2, 2006" }}</div>
+
+                <h1><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Page.Title }}</a></h1>
+
+                {{ with .Params.desc }}
+                    {{ . }}
+                {{ end }}
+            </p>
+        </div>
     {{ end }}
 {{ end }}
 </div>
