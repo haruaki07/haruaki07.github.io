@@ -1,4 +1,4 @@
 +++
 title = "Projects"
-type = "gallery"
-+++
+type = "project"
++++s

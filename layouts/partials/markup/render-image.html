@@ -1,0 +1,48 @@
+{{- $page := .page }}
+{{- $url := .url }}
+{{- $title := .title }}
+{{- $alt := .alt }}
+{{- $id := .id }}
+
+{{- $resource := "" }}
+{{/* Look for the resource in the given page bundle */}}
+{{- if $page.Resources.GetMatch ($url.String) }}
+  {{- $resource = $page.Resources.GetMatch ($url.String) }}
+{{/* Look for the resource global and remote scope  */}}
+  {{- else if resources.GetMatch ($url.String) }}
+{{- $resource = resources.Get ($url.String) }}
+{{- end }}
+
+{{/* Possible sizes for resizing */}}
+{{- $sizes := slice "340" "600" "960" "1280" "1600" "1920" "2560" "3840" -}}
+
+{{- with $resource }}
+<figure id="{{ $id }}">
+  <div style="display: flex; justify-content: center">
+  <img style="display: grid; place-items: center; margin: 0; border-radius: 5px;"
+    {{- if eq .MediaType.SubType "svg" }}
+    {{/* Don't resize vector images */}}
+      src="{{ .RelPermalink }}"
+    {{- else }}
+      srcset="
+      {{- with $sizes -}}
+        {{- range $i, $e := . -}}
+          {{- if ge $resource.Width . -}}
+            {{- if $i }}, {{ end -}}{{- ($resource.Resize (printf " %sx%s" . " webp") ).RelPermalink }} {{ . }}w
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}"
+      src="{{ (.Resize "660x webp").RelPermalink }}"
+    {{- end }}
+  {{ with $alt }} alt="{{ . }}" {{ end }}
+  loading="lazy"
+  style="padding-bottom: 0.5em" />
+  </div>
+  <figcaption style="padding: 0.8em 0.5em 0.5em; margin-block-start: 0.0em; line-height: 1.0em; font-size: 0.75em; text-align: center;">
+    {{ with $title }} {{ . }} {{ end }}
+    (<a href="{{ .RelPermalink | safeURL }}" target="_blank">full size</a>)
+  </figcaption>
+</figure>
+{{- else }}
+  --- RESOURCE {{ $url }} NOT FOUND ---
+{{- end }}

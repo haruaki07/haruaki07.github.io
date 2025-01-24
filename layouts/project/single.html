@@ -1,0 +1,16 @@
+{{ define "main" }}
+<h1>{{ .Page.Title }}</h1>
+
+{{ .PublishDate.Format "Jan. 2, 2006" }}
+
+<br><br>
+
+{{ .Content }}
+
+{{ with .Params.link }}
+    <a href="{{ . }}">View Project</a>
+{{ end }}
+
+{{ template "_internal/disqus.html" . }}
+
+{{ end }}
